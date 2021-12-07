@@ -80,10 +80,10 @@ namespace ExcelParser.MyObject
                                             string[] t = dt.Rows[k + l][1].ToString().Split("-");
                                             if (t.Length > 1)
                                             {
-                                                Time time = new Time();
-                                                time.timeStart = t[0] ?? "";
-                                                time.timeEnd = t[1] ?? "";
-                                                para.timeList.Add(time);
+                                                //Time time = new Time();
+                                                //time.timeStart = t[0] ?? "";
+                                                //time.timeEnd = t[1] ?? "";
+                                                para.timeList.Add(Time.GetTime(t[0],t[1]));
                                             }
                                         }
 
@@ -147,10 +147,11 @@ namespace ExcelParser.MyObject
                                             string[] t = dt.Rows[k + l][1].ToString().Split("-");
                                             if (t.Length > 1)
                                             {
-                                                Time time = new Time();
-                                                time.timeStart = t[0] ?? "";
-                                                time.timeEnd = t[1] ?? "";
-                                                para.timeList.Add(time);
+                                                //Time time = new Time();
+                                                //time.timeStart = t[0] ?? "";
+                                                //time.timeEnd = t[1] ?? "";
+                                                //para.timeList.Add(time);
+                                                para.timeList.Add(Time.GetTime(t[0], t[1]));
                                             }
                                         }
 
