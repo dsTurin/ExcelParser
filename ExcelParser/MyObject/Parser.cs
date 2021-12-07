@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -32,18 +33,25 @@ namespace ExcelParser.MyObject
                     // Преобразовываем excel в dataSet
                     var result = reader.AsDataSet();
 
-                    
-
                     List<Group> listGroups = new List<Group>();
+
+                    
 
                     foreach (DataTable dt in result.Tables)
                     {
-                        if (dt.TableName.Contains("5 курс") || dt.TableName.Equals("магистратура"))
-                            continue;
-                        
+                        //if (dt.TableName.Contains("5 курс") || dt.TableName.Equals("магистратура"))
+                        //    continue;
+
+                        var indexs = GetValueIndex(dt.TableName);
+                        int fWeekIndexStart = indexs.f1;
+                        int fWeekIndexEnd = indexs.f2;
+                        int sWeekIndexStart = indexs.f3;
+                        int sWeekIndexEnd = indexs.f4;
+
+
                         //Первая неделя расписания
 
-                        for (int i = 3; i <=14 ; i++)
+                        for (int i = fWeekIndexStart; i <=fWeekIndexEnd ; i++)
                         {
                             Group group = new Group();
                             group.paraList = new List<Para>();
@@ -80,9 +88,9 @@ namespace ExcelParser.MyObject
                                         }
 
                                         //Получаем занятия и приписку с Преподавателем, корпусом и кабинетом; i - колонка группы
-                                        //para.lesson = Lesson.GetLesson(dt.Rows[k][i].ToString(), dt.Rows[k + 1][i].ToString());
-                                        para.lesson.name = dt.Rows[k][i].ToString();
-                                        para.lesson.description = dt.Rows[k + 1][i].ToString();
+                                        para.lesson = Lesson.GetLesson(dt.Rows[k][i].ToString(), dt.Rows[k + 1][i].ToString());
+                                        //para.lesson.name = dt.Rows[k][i].ToString();
+                                        //para.lesson.description = dt.Rows[k + 1][i].ToString();
 
                                         //Получаем номер пары
                                         //Где то в конце расписания нет номера пары, но есть время, значит она восьмая
@@ -110,7 +118,7 @@ namespace ExcelParser.MyObject
                         }
 
                         //Вторая неделя расписания
-                        for (int i = 18; i <= 28; i++)
+                        for (int i = sWeekIndexStart; i <= sWeekIndexEnd; i++)
                         {
                             Group group = new Group();
                             group.paraList = new List<Para>();
@@ -148,9 +156,9 @@ namespace ExcelParser.MyObject
 
                                         //Получаем занятия и приписку с Преподавателем, корпусом и кабинетом; i - колонка группы
 
-                                        //para.lesson = Lesson.GetLesson(dt.Rows[k][i].ToString(), dt.Rows[k + 1][i].ToString());
-                                        para.lesson.name = dt.Rows[k][i].ToString();
-                                        para.lesson.description = dt.Rows[k + 1][i].ToString();
+                                        para.lesson = Lesson.GetLesson(dt.Rows[k][i].ToString(), dt.Rows[k + 1][i].ToString());
+                                        //para.lesson.name = dt.Rows[k][i].ToString();
+                                        //para.lesson.description = dt.Rows[k + 1][i].ToString();
 
                                         //Получаем номер пары
                                         //Где то в конце расписания нет номера пары, но есть время, значит она восьмая
@@ -183,31 +191,49 @@ namespace ExcelParser.MyObject
             //var paraList = groupList.SelectMany(w => w.paraList);
             //var timeList = paraList.Select(w => w.timeList);
 
-            foreach (var item in groupList)
-            {
-                Console.WriteLine($"{item.weekNumber} - {item.groupName}");
+            //foreach (var item in groupList)
+            //{
+            //    Console.WriteLine($"{item.weekNumber} - {item.groupName}");
 
                 
-                string dayofWeek = string.Empty;
-                int k = 0;
-                foreach (var para in item.paraList)
-                {
-                    if (!dayofWeek.Equals(para.dayOfWeek))
-                    {
-                        dayofWeek = para.dayOfWeek;
-                        Console.WriteLine(para.dayOfWeek);
-                    }
+            //    string dayofWeek = string.Empty;
+            //    int k = 0;
+            //    foreach (var para in item.paraList)
+            //    {
+            //        if (!dayofWeek.Equals(para.dayOfWeek))
+            //        {
+            //            dayofWeek = para.dayOfWeek;
+            //            Console.WriteLine(para.dayOfWeek);
+            //        }
 
-                    string startTime = $"{para.timeList[0].timeStart} {para.timeList[0].timeEnd}";
-                    string endTime = $"{para.timeList[1].timeStart} {para.timeList[1].timeEnd}";
+            //        string startTime = $"{para.timeList[0].timeStart} {para.timeList[0].timeEnd}";
+            //        string endTime = $"{para.timeList[1].timeStart} {para.timeList[1].timeEnd}";
 
-                    Console.WriteLine($"{para.Number} - {startTime} - {endTime} - {para.lesson.name} - {para.lesson.description}");
-                }
+            //        Console.WriteLine($"{para.Number} - {startTime} - {endTime} - {para.lesson.name} - {para.lesson.description}");
+            //    }
 
-                Console.WriteLine();
-            }
+            //    Console.WriteLine();
+            //}
+            
             Console.ReadKey();
 
+        }
+
+        private  static (int f1, int f2,int f3,int f4) GetValueIndex(string tableName)
+        {
+            switch (tableName)
+            {
+                case "5 курс":
+                    return (3, 7, 11, 15);
+                    break;
+                case "магистратура":
+                    return (3, 18, 22, 37);
+                    break;
+                default:
+                    return (3, 14, 18, 28);
+            }
+
+            return (3, 14, 18, 28);
         }
 
         public static string ConvertDataTableToHTML(DataTable dt)

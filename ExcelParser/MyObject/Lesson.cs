@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 
 namespace ExcelParser.MyObject
 {
@@ -14,7 +9,7 @@ namespace ExcelParser.MyObject
         public string teacher { get; set; }
         public string corpus { get; set; }
         public string classRoom { get; set; }
-        public string description { get; set; }
+        //public string description { get; set; }
 
         //Тестовый метод разбора
         public static Lesson GetLesson(string rowFirst, string rowSecond)
@@ -44,22 +39,18 @@ namespace ExcelParser.MyObject
                 else 
                     l.teacher = s2[0] ?? "";
 
-                if (s2.Length > 2)
-                {
-                    //string[] s3 = s2.Where(w => !string.IsNullOrWhiteSpace(w)).ToArray()[1]?.Split('-');
-                    string[] s3 = s2[2]?.Split('-');
-                    l.corpus = s3[0] ?? "";
-                    l.classRoom = s3[1] ?? "";
-                }
-                else if (s2.Length == 2)
+                if (s2.Length > 1)
                 {
                     string[] s3 = s2[1]?.Split('-');
-                    l.corpus = s3[0] ?? "";
-                    l.classRoom = s3[1] ?? "";
+                    if (s3.Length > 1)
+                    {
+                        l.corpus = s3[0] ?? "";
+                        l.classRoom = s3[1] ?? "";
+                    }
+                    else 
+                        l.classRoom = s3[0] ?? "";
                 }
-                
             }
-            
 
             return l;
         }
