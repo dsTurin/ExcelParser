@@ -278,3 +278,77 @@ from  dbo.StudentGradeList  sgl
 		INNER JOIN dbo.Lessons l on l.id = sgl.lessonId
 		INNER JOIN dbo.TeachersView t on t.id = sgl.teacherId
 go
+
+create table mifi.LessonsTypes  (id bigint constraint [PK_LessonsTypes] primary key clustered
+											  identity(1, 1)
+											  not null
+								   ,name VARCHAR(100) NULL
+								   ,shortName VARCHAR(100) NULL
+								   );
+
+create table mifi.DaysOfWeeks  (id bigint constraint [PK_DaysOfWeeks] primary key clustered
+											  identity(1, 1)
+											  not NULL
+                                     ,name VARCHAR(30) NOT NULL
+								   );
+
+create table mifi.Corps  (id bigint constraint [PK_Corps] primary key clustered
+											  identity(1, 1)
+											  not null
+								   ,name VARCHAR(10) NOT NULL
+								   );
+create table mifi.ClassRooms  (id bigint constraint [PK_ClassRooms] primary key clustered
+											  identity(1, 1)
+											  not null
+								   ,name VARCHAR (10)
+								   );
+
+create table mifi.CorpusContent  (id bigint constraint [PK_CorpsContent] primary key clustered
+											  identity(1, 1)
+											  not null
+								   ,corpusId BIGINT NOT NULL
+								   ,classRoom BIGINT NOT NULL
+								   ,CONSTRAINT FK_CorpsContent_Corps foreign key (corpusId) references mifi.Corps (id)
+								   ,CONSTRAINT FK_CorpsContent_ClassRooms foreign key (corpusId) references mifi.ClassRooms (id)
+								   );
+
+create table mifi.TimeTableReesters  (id bigint constraint [PK_TimeTableReesters] primary key clustered
+											  identity(1, 1)
+											  not null
+								   ,created datetime not null CONSTRAINT [DF_TimeTableReesters_created] DEFAULT (getdate())
+								   ,fileName VARCHAR(255) NOT NULL
+								   ,userId bigint not null
+								   ,CONSTRAINT FK_TimeTableReesters_Users foreign key (userId) references mifi.Users (id)
+								   );
+
+create table mifi.TimeTableReesterRecords  (id bigint constraint [PK_TimeTableReesterRecords] primary key clustered
+											  identity(1, 1)
+											  not NULL
+                                    ,reesterId BIGINT NOT NULL
+									,created datetime not null CONSTRAINT [DF_TimeTableReesterRecords_created] DEFAULT (getdate())-- default
+									,weekNumber VARCHAR(255) NULL
+									,groupId BIGINT NULL
+									,dayOfWeekId BIGINT
+									,paraNumber VARCHAR(1) NULL
+									,timeStart_1 VARCHAR(20) NULL
+									,timeEnd_1 VARCHAR(20) NULL
+									,timeStart_2 VARCHAR(20) NULL
+									,timeEnd_2 VARCHAR(20) NULL
+									,lessonId BIGINT NULL
+									,lessonTypeId BIGINT NULL
+									,teacherId BIGINT NULL
+									,corpsId BIGINT NULL
+									,classRoomId BIGINT NULL
+									,apx VARCHAR(max) NULL								   
+								   ,CONSTRAINT FK_TimeTableReesterRecords_TimeTableReesters foreign key (reesterId) references mifi.TimeTableReesters (id)
+								   ,CONSTRAINT FK_TimeTableReesterRecords_Groups foreign key (groupId) references mifi.Groups (id)
+								   ,CONSTRAINT FK_TimeTableReesterRecords_DaysOfWeeks foreign key (dayOfWeekId) references mifi.DaysOfWeeks (id)
+								   ,CONSTRAINT FK_TimeTableReesterRecords_Lessons foreign key (lessonId) references mifi.Lessons (id)
+								   ,CONSTRAINT FK_TimeTableReesterRecords_LessonsTypes foreign key (lessonTypeId) references mifi.LessonsTypes (id)
+								   ,CONSTRAINT FK_TimeTableReesterRecords_Teachers foreign key (teacherId) references mifi.Teachers (id)
+								   ,CONSTRAINT FK_TimeTableReesterRecords_Corps foreign key (corpsId) references mifi.Corps (id)
+								   ,CONSTRAINT FK_TimeTableReesterRecords_ClassRooms foreign key (classRoomId) references mifi.ClassRooms (id)
+								   );
+
+
+
