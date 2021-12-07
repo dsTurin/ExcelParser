@@ -1,0 +1,280 @@
+create table dbo.Users  (id bigint constraint [PK_Users] primary key clustered
+										  identity(1, 1)
+										  not null
+							   ,login varchar(255) not null
+							   ,password varchar(255) not null
+							   ,email varchar(255) not null
+							   ,isLocked bit not null
+							   );
+
+create table dbo.Rights  (id bigint constraint [PK_Rights] primary key clustered
+										  identity(1, 1)
+										  not null
+							   ,name varchar(255) not null
+							   );
+
+create table dbo.UserRights  (id bigint constraint [PK_UserRights] primary key clustered
+										  identity(1, 1)
+										  not null
+							   ,userId bigint not null
+							   ,rightId bigint not null
+							   ,CONSTRAINT FK_UserRights_Users foreign key (userId) references dbo.Users (id)
+							   ,CONSTRAINT FK_UserRights_Rights foreign key (rightId) references dbo.Rights (id)
+							   );
+CREATE VIEW dbo.UserRightsView
+AS
+    
+	SELECT  ur.id
+			,ur.userId
+			,u.login
+			,ur.rightId
+			,r.name
+	from dbo.UserRights ur 
+			inner join dbo.Users u  on u.id = ur.userId
+			inner join dbo.Rights r on r.id = ur.rightId
+
+GO
+
+
+create table dbo.Courses  (id bigint constraint [PK_Courses] primary key clustered
+										  identity(1, 1)
+										  not null
+							   ,name int not null
+							   );
+
+create table dbo.Faculties  (id bigint constraint [PK_Faculties] primary key clustered
+										  identity(1, 1)
+										  not null
+							   ,name varchar(255));
+
+
+
+create table dbo.Specialties  (id bigint constraint [PK_Specialties] primary key clustered
+										  identity(1, 1)
+										  not null
+								,name varchar(255) not null
+								,number varchar(255) null
+								,facultyId bigint not null
+							   ,CONSTRAINT FK_Specialties_Faculties  foreign key (facultyId) references dbo.Faculties  (id)
+							   );
+
+CREATE VIEW dbo.SpecialtiesView
+as
+	select s.id
+			,s.name
+			,s.number
+			,s.facultyId
+			,f.name 
+	from dbo.Specialties s
+			inner join dbo.Faculties f on f.id = s.facultyId
+    
+GO
+
+
+create table dbo.Groups  (id bigint constraint [PK_Groups] primary key clustered
+										  identity(1, 1)
+										  not null
+							   ,name varchar(255) not null
+							   ,shortName varchar(255) null
+							   ,specialityId bigint not null
+							   ,courseId bigint not null
+							   ,CONSTRAINT FK_Groups_Specialties foreign key (specialityId) references  dbo.Specialties (id)
+							   ,CONSTRAINT FK_Groups_Courses foreign key (courseId) references  dbo.Courses (id)
+							   );
+CREATE VIEW dbo.GroupsView
+as
+
+	select g.id
+			,g.name as groupName
+			,g.shortName as groupShortName
+			,g.specialityId 
+			,s.name as specialityName
+			,s.number as specialityNumber
+			,g.courseId
+			,c.name as courseName
+	from dbo.Groups g
+			inner JOIN dbo.Specialties s on s.id =  g.specialityId
+			INNER JOIN dbo.Courses c on c.id = g.courseId
+    
+GO
+
+
+create table dbo.Students  (id bigint constraint [PK_Students] primary key clustered
+										  identity(1, 1)
+										  not null
+							   ,lastName varchar(255) not null
+							   ,firstName varchar(255) not null
+							   ,middleName varchar(255) not null
+							   ,dateOfBirth datetime not null
+							   ,email varchar(255) not null
+							   ,specialityId bigint not null
+							   ,courseId bigint not null
+							   ,groupId bigint not null
+							   ,userId bigint not null
+							   ,CONSTRAINT FK_Students_Specialties foreign key (specialityId) references  dbo.Specialties (id)
+							   ,CONSTRAINT FK_Students_Courses foreign key (courseId) references  dbo.Courses (id)
+							   ,CONSTRAINT FK_Students_Groups foreign key (groupId) references  dbo.Groups (id)
+							   ,CONSTRAINT FK_Students_Users foreign key (userId) references  dbo.Users (id)
+							   );
+
+
+CREATE VIEW dbo.StudentsView
+AS
+    SELECT stud.id
+			,stud.lastName
+			,stud.firstName
+			,stud.middleName
+			,stud.lastName + ' ' + stud.firstName + ' ' + stud.middleName as FIO
+			,stud.dateOfBirth
+			,stud.email
+			,stud.specialityId
+			,s.name as specialityName
+			,s.number as as specialityNumber
+			,stud.courseId
+			,c.name as courseName
+			,stud.groupId
+			,g.name as groupName
+			,g.shortName as groupShortName			
+			,stud.userId
+			,u.login as userLogin
+	from dbo.Students stud
+			inner join dbo.Specialties s on s.id = stud.specialityId
+			INNER JOIN dbo.Courses c on c.id = stud.courseId
+			INNER JOIN dbo.Groups g on g.id = stud.groupId
+			INNER JOIN dbo.Users u on u.id = stud.userId
+
+GO
+
+
+create table dbo.Teachers  (id bigint constraint [PK_Teachers] primary key clustered
+										  identity(1, 1)
+										  not null
+							   ,lastName varchar(255) not null
+							   ,firstName varchar(255) not null
+							   ,middleName varchar(255) not null
+							   ,dateOfBirth datetime not null
+							   ,email varchar(255) not null
+							   ,userId bigint not null
+							   ,CONSTRAINT FK_Teachers_Users foreign key (userId) references dbo.Users (id)
+							   );
+
+CREATE VIEW dbo.TeachersView
+AS
+  SELECT t.id
+		,t.lastName
+		,t.firstName
+		,t.middleName
+		,t.lastName + ' ' + t.firstName + ' ' + t.middleName as FIO
+		,t.dateOfBirth
+		,t.email
+		,t.userId
+		,u.login 
+  from dbo.Teachers t
+		inner JOIN dbo.Users u on u.id = t.userId
+
+GO
+
+create table dbo.Lessons  (id bigint constraint [PK_Lessons] primary key clustered
+										  identity(1, 1)
+										  not null
+							   ,name varchar(255) not null);
+
+create table dbo.FacultyLessons  (id bigint constraint [PK_FacultyLessons] primary key clustered
+										  identity(1, 1)
+										  not null
+								,facultyId bigint not null
+								,lessonId bigint not null
+							   ,CONSTRAINT FK_FacultyLessons_Faculties foreign key (facultyId) references dbo.Faculties (id)
+							   ,CONSTRAINT FK_FacultyLessons_Lessons foreign key (lessonId) references dbo.Lessons (id)
+							   );
+
+CREATE VIEW dbo.FacultyLessonsView
+AS
+  SELECT fl.id
+		,fl.facultyId
+		,f.name as facultyName
+		,fl.lessonId
+		,l.name as lessonName
+  from dbo.FacultyLessons fl
+		INNER JOIN dbo.Faculties f on f.id = fl.facultyId
+		INNER JOIN dbo.Lessons l on l.id = fl.lessonId
+  
+GO
+
+
+create table dbo.TeacherLessons  (id bigint constraint [PK_TeacherLessons] primary key clustered
+										  identity(1, 1)
+										  not null
+								,teacherId bigint not null
+							   ,lessonId bigint not null
+							   ,CONSTRAINT FK_TeacherLessons_Teachers foreign key (teacherId) references dbo.Teachers  (id)
+							   ,CONSTRAINT FK_TeacherLessons_Lessons foreign key (lessonId) references dbo.Lessons  (id)
+							   );
+
+CREATE VIEW dbo.TeacherLessonsView
+as
+
+SELECT  tl.id
+		,tl.teacherId
+		,tv.FIO as teacherFIO
+		,tl.lessonId
+		,l.name as lessonName
+from  dbo.TeacherLessons  tl
+		INNER JOIN dbo.TeachersView tv on tv.id = tl.teacherId
+		INNER JOIN dbo.Lessons l on l.id = tl.lessonId
+GO
+
+
+
+create table dbo.Portfolio  (id bigint constraint [PK_Portfolio] primary key clustered
+										  identity(1, 1)
+										  not null
+							   ,studentId bigint not null
+							   ,achievement bigint not null
+							   ,numberMark bigint not null
+							   ,CONSTRAINT FK_Portfolio_Students foreign key (studentId) references dbo.Students (id)
+							   );
+
+CREATE VIEW dbo.PortfolioView
+as
+
+SELECT  p.id
+		,p.studentId
+		,s.FIO
+		,p.achievement
+		,p.numberMark
+from  dbo.Portfolio  p
+		INNER JOIN dbo.StudentsView s on s.id = p.studentId
+
+go
+
+create table dbo.StudentGradeList  (id bigint constraint [PK_StudentGradeList] primary key clustered
+										  identity(1, 1)
+										  not null
+							   ,studentId bigint not null
+							   ,lessonId bigint not null
+							   ,teacherId bigint not null
+							   ,created datetime not null CONSTRAINT [DF_StudentGradeList_created] DEFAULT (getdate())
+							   ,points decimal not null CONSTRAINT [DF_StudentGradeList_pints] DEFAULT (0)
+							   ,CONSTRAINT FK_StudentGradeList_Students foreign key (studentId) references dbo.Students (id)
+							   ,CONSTRAINT FK_StudentGradeList_Lessons foreign key (lessonId) references dbo.Lessons (id)
+							   ,CONSTRAINT FK_StudentGradeList_Teachers foreign key (teacherId) references dbo.Teachers (id)
+							   );
+
+
+CREATE VIEW dbo.StudentGradeListView
+as
+SELECT  sgl.id
+		,sgl.studentId
+		,s.FIO
+		,sgl.lessonId
+		,l.name
+		,sgl.teacherId
+		,t.FIO
+		,sgl.created
+		,sgl.points
+from  dbo.StudentGradeList  sgl
+		INNER JOIN dbo.StudentsView s on s.id = sgl.studentId
+		INNER JOIN dbo.Lessons l on l.id = sgl.lessonId
+		INNER JOIN dbo.TeachersView t on t.id = sgl.teacherId
+go
