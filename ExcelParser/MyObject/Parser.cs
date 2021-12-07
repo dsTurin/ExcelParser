@@ -225,15 +225,11 @@ namespace ExcelParser.MyObject
             {
                 case "5 курс":
                     return (3, 7, 11, 15);
-                    break;
                 case "магистратура":
                     return (3, 18, 22, 37);
-                    break;
                 default:
                     return (3, 14, 18, 28);
             }
-
-            return (3, 14, 18, 28);
         }
 
         public static string ConvertDataTableToHTML(DataTable dt)

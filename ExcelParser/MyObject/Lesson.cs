@@ -9,7 +9,6 @@ namespace ExcelParser.MyObject
         public string teacher { get; set; }
         public string corpus { get; set; }
         public string classRoom { get; set; }
-        //public string description { get; set; }
 
         //Тестовый метод разбора
         public static Lesson GetLesson(string rowFirst, string rowSecond)
