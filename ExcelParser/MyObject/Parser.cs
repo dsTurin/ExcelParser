@@ -48,7 +48,7 @@ namespace ExcelParser.MyObject
                         {
                             Group group = new Group();
                             group.paraList = new List<Para>();
-                            group.weekNumber = int.Parse(dt.Rows[0][0].ToString());
+                            group.weekNumber = 1;//int.Parse(dt.Rows[0][0].ToString());
                             group.groupName = dt.Rows[0][i].ToString();
 
                             int indexDay = 1;
@@ -108,7 +108,7 @@ namespace ExcelParser.MyObject
                         {
                             Group group = new Group();
                             group.paraList = new List<Para>();
-                            group.weekNumber = int.Parse(dt.Rows[0][0].ToString());
+                            group.weekNumber = 2;//int.Parse(dt.Rows[0][0].ToString());
                             group.groupName = dt.Rows[0][i].ToString();
 
                             int indexDay = 1;
@@ -165,8 +165,37 @@ namespace ExcelParser.MyObject
                     groupList = listGroups;
                 }
             }
-            
-            Console.ReadKey();
+
+            string writePath = @"resultParsingAPX.txt";
+            using (StreamWriter sw = new StreamWriter(writePath, false, Encoding.Default))
+            {
+                foreach (Group g in groupList)
+                {
+                    string headerAPX = string.Empty;
+                    headerAPX = $"{g.weekNumber};{g.groupName};";
+
+                    foreach (Para p in g.paraList)
+                    {
+                        string apx = headerAPX;
+
+                        string paraStart = $"{p.timeList[0].timeStart}+{p.timeList[0].timeEnd}";
+                        string paraEnd = $"{p.timeList[1].timeStart}+{p.timeList[1].timeEnd}";
+
+                        apx += $"{p.dayOfWeek};{p.Number};{paraStart};{paraEnd};";
+                        apx +=
+                            $"{p.lesson.name}+{p.lesson.type}+{p.lesson.teacher}+{p.lesson.corpus}+{p.lesson.classRoom};";
+
+                        //string s = $"{p.lesson.name}+{p.lesson.type}+{p.lesson.teacher}+{p.lesson.corpus}+{p.lesson.classRoom};";
+                        //var sp = s.Split("+");
+
+                        sw.WriteLine(apx);
+
+                        //Console.WriteLine(apx);
+                    }
+                }
+            }
+
+            //Console.ReadKey();
 
         }
 
