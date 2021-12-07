@@ -35,22 +35,15 @@ namespace ExcelParser.MyObject
 
                     List<Group> listGroups = new List<Group>();
 
-                    
-
                     foreach (DataTable dt in result.Tables)
                     {
-                        //if (dt.TableName.Contains("5 курс") || dt.TableName.Equals("магистратура"))
-                        //    continue;
-
                         var indexs = GetValueIndex(dt.TableName);
                         int fWeekIndexStart = indexs.f1;
                         int fWeekIndexEnd = indexs.f2;
                         int sWeekIndexStart = indexs.f3;
                         int sWeekIndexEnd = indexs.f4;
 
-
                         //Первая неделя расписания
-
                         for (int i = fWeekIndexStart; i <=fWeekIndexEnd ; i++)
                         {
                             Group group = new Group();
@@ -79,18 +72,11 @@ namespace ExcelParser.MyObject
                                         {
                                             string[] t = dt.Rows[k + l][1].ToString().Split("-");
                                             if (t.Length > 1)
-                                            {
-                                                //Time time = new Time();
-                                                //time.timeStart = t[0] ?? "";
-                                                //time.timeEnd = t[1] ?? "";
                                                 para.timeList.Add(Time.GetTime(t[0],t[1]));
-                                            }
                                         }
 
                                         //Получаем занятия и приписку с Преподавателем, корпусом и кабинетом; i - колонка группы
                                         para.lesson = Lesson.GetLesson(dt.Rows[k][i].ToString(), dt.Rows[k + 1][i].ToString());
-                                        //para.lesson.name = dt.Rows[k][i].ToString();
-                                        //para.lesson.description = dt.Rows[k + 1][i].ToString();
 
                                         //Получаем номер пары
                                         //Где то в конце расписания нет номера пары, но есть время, значит она восьмая
@@ -146,20 +132,11 @@ namespace ExcelParser.MyObject
                                         {
                                             string[] t = dt.Rows[k + l][1].ToString().Split("-");
                                             if (t.Length > 1)
-                                            {
-                                                //Time time = new Time();
-                                                //time.timeStart = t[0] ?? "";
-                                                //time.timeEnd = t[1] ?? "";
-                                                //para.timeList.Add(time);
                                                 para.timeList.Add(Time.GetTime(t[0], t[1]));
-                                            }
                                         }
 
                                         //Получаем занятия и приписку с Преподавателем, корпусом и кабинетом; i - колонка группы
-
                                         para.lesson = Lesson.GetLesson(dt.Rows[k][i].ToString(), dt.Rows[k + 1][i].ToString());
-                                        //para.lesson.name = dt.Rows[k][i].ToString();
-                                        //para.lesson.description = dt.Rows[k + 1][i].ToString();
 
                                         //Получаем номер пары
                                         //Где то в конце расписания нет номера пары, но есть время, значит она восьмая
@@ -188,33 +165,6 @@ namespace ExcelParser.MyObject
                     groupList = listGroups;
                 }
             }
-
-            //var paraList = groupList.SelectMany(w => w.paraList);
-            //var timeList = paraList.Select(w => w.timeList);
-
-            //foreach (var item in groupList)
-            //{
-            //    Console.WriteLine($"{item.weekNumber} - {item.groupName}");
-
-                
-            //    string dayofWeek = string.Empty;
-            //    int k = 0;
-            //    foreach (var para in item.paraList)
-            //    {
-            //        if (!dayofWeek.Equals(para.dayOfWeek))
-            //        {
-            //            dayofWeek = para.dayOfWeek;
-            //            Console.WriteLine(para.dayOfWeek);
-            //        }
-
-            //        string startTime = $"{para.timeList[0].timeStart} {para.timeList[0].timeEnd}";
-            //        string endTime = $"{para.timeList[1].timeStart} {para.timeList[1].timeEnd}";
-
-            //        Console.WriteLine($"{para.Number} - {startTime} - {endTime} - {para.lesson.name} - {para.lesson.description}");
-            //    }
-
-            //    Console.WriteLine();
-            //}
             
             Console.ReadKey();
 
@@ -233,45 +183,5 @@ namespace ExcelParser.MyObject
             }
         }
 
-        public static string ConvertDataTableToHTML(DataTable dt)
-        {
-            if (dt.Rows.Count == 0) return ""; // enter code here
-
-            StringBuilder builder = new StringBuilder();
-            builder.Append("<html>");
-            builder.Append("<head>");
-            builder.Append("<title>");
-            builder.Append("Page-");
-            builder.Append(Guid.NewGuid());
-            builder.Append("</title>");
-            builder.Append("</head>");
-            builder.Append("<body>");
-            builder.Append("<table border='1px' cellpadding='5' cellspacing='0' ");
-            builder.Append("style='border: solid 1px Silver; font-size: x-small;'>");
-            builder.Append("<tr align='left' valign='top'>");
-            foreach (DataColumn c in dt.Columns)
-            {
-                builder.Append("<td align='left' valign='top'><b>");
-                builder.Append(c.ColumnName);
-                builder.Append("</b></td>");
-            }
-            builder.Append("</tr>");
-            foreach (DataRow r in dt.Rows)
-            {
-                builder.Append("<tr align='left' valign='top'>");
-                foreach (DataColumn c in dt.Columns)
-                {
-                    builder.Append("<td align='left' valign='top'>");
-                    builder.Append(r[c.ColumnName]);
-                    builder.Append("</td>");
-                }
-                builder.Append("</tr>");
-            }
-            builder.Append("</table>");
-            builder.Append("</body>");
-            builder.Append("</html>");
-
-            return builder.ToString();
-        }
     }
 }
